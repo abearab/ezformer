@@ -7,22 +7,16 @@ channels:
 dependencies:
   - python==3.11
   - pytorch
-  - pytorch-cuda=12.1
+  - pytorch-cuda==12.1
   - torchvision
   - torchaudio
-  - lightning
   - cuda-toolkit
   - torchmetrics
   - numpy
   - pandas
   - python-igraph
-  - leidenalg
-  - scikit-learn
   - bioconda::basenji
-  - scanpy
-  - anndata
   - matplotlib
-  - seaborn
   - dill
   - pynvml
   - ipython
@@ -36,8 +30,6 @@ dependencies:
     - tensorflow-hub
     - numba
     - pytdc
-    - adpbulk
-    - pydeseq2
     - adjustText
     - watermark
     - pysam
@@ -47,4 +39,3 @@ dependencies:
     - pyyaml
     - tangermeme
     - modisco-lite
-    - pyBigWig
