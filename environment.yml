@@ -18,10 +18,7 @@ dependencies:
   - leidenalg
   - scikit-learn
   - bioconda::basenji
-  - scanpy
-  - anndata
   - matplotlib
-  - seaborn
   - dill
   - pynvml
   - ipython
@@ -34,10 +31,6 @@ dependencies:
     # - tensorflow-gpu
     # - tensorflow-hub
     - numba
-    # - pytdc
-    - adpbulk
-    - pydeseq2
-    - adjustText
     - watermark
     - pysam
     - einops
