@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "ezformer"
+version = "0.0.1"
+authors = [
+	"Abe Arab <abarbiology@gmail.com>"
+]
+license = "MIT"
+readme = "README.md"
+description = "Run enformer like models, get prediction tracks, and perform benchmarking"
+classifiers = [
+	"License :: OSI Approved :: MIT License"
+]
+packages = [
+	{ include = "ezformer" },
+	{ include = "pyproject.toml" },
+]
+
+[tool.poetry.urls]
+Source = "https://github.com/abearab/ezformer"
+
+[tool.poetry.dependencies]
+python = "^3.9 <4.0"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "*"
+tomli = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning>=1.0.0,<2.0.0"]
+build-backend = "poetry_dynamic_versioning.backend"
