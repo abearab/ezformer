@@ -1,16 +1,28 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from scipy.stats import spearmanr, pearsonr
+import anndata as ad
 
 
 #Re-load saved ref/var scores and process them
-def process_enformer_results(
-        experiment_prefix, 
+def process_predict_results(
         offsets, 
+        targets_df,
+        edits_df,
+        experiment_prefix,
         center_on_tss=True, re_center=False, score_rc=True,
-        write_to_file=False,
         verbose=True):
+    """
+    Load saved prediction results and process them for downstream analysis.
+
+    offsets: the list of offsets to load from those used for runing enformer like model
+    target_df: the dataframe containing the meta data used in the enformer tracks
+    edits_df: the dataframe containing the edits
+    experiment_prefix: the prefix to save the results
+    center_on_tss: whether to center on TSS. Default is True
+    re_center: whether to recenter the edits. Default is False
+    score_rc: score reverse complement as another data augmentation. Default is True
+    verbose: whether to print verbose output. Default is True
+    """
 
     fold_index = [0]
 
@@ -48,44 +60,13 @@ def process_enformer_results(
 
     #Cache final predicted scores (averaged across ensemble)
 
-    if write_to_file:
-        np.save(experiment_prefix + '_final_scores' + tss_str + recentered_str + '.npy', scores)
+    adata = ad.AnnData(
+        X=scores.T,
+        obs=targets_df,
+        var=edits_df
+    )
 
-    return scores
+    adata.layers['log2_fold_change'] = adata.X
+    adata.layers['pct_change'] = 100. * (2**adata.X - 1.)
 
-
-#Function to plot predictions
-def plot_predictions(df, df_col, scores, targets_df, df_col_pred):
-    target_index = targets_df.index
-    
-    score_log2 = np.mean(scores[:, target_index], axis=1)
-    pct_change = 100. * (2**score_log2 - 1.)
-    
-    df[df_col_pred] = pct_change
-
-    df_sub = df.loc[~(df[df_col].isnull() | df[df_col_pred].isnull())]
-
-    y_pred = np.array(df_sub[df_col_pred].values)
-    y_true = np.array(df_sub[df_col].values)
-
-    rs = spearmanr(y_pred, y_true)[0]
-    rp = pearsonr(y_pred, y_true)[0]
-
-    f = plt.figure(figsize=(3, 3))
-
-    plt.scatter(y_pred, y_true, s=4, color='black')
-    
-    plt.axhline(y=0, color='darkgreen', linewidth=1, linestyle='--')
-    plt.axvline(x=0, color='darkgreen', linewidth=1, linestyle='--')
-    
-    plt.xticks(fontsize=8)
-    plt.yticks(fontsize=8)
-    
-    plt.xlabel(df_col_pred, fontsize=8)
-    plt.ylabel(df_col, fontsize=8)
-    
-    plt.title("Spearman r = " + str(round(rs, 3)) + "\n Pearson r = " + str(round(rp, 3)), fontsize=8)
-
-    plt.tight_layout()
-
-    plt.show()
+    return adata
