@@ -9,6 +9,7 @@ def process_enformer_results(
         experiment_prefix, 
         offsets, 
         center_on_tss=True, re_center=False, score_rc=True,
+        write_to_file=False,
         verbose=True):
 
     fold_index = [0]
@@ -39,21 +40,7 @@ def process_enformer_results(
     ref_scores = np.mean(np.concatenate(all_ref_scores, axis=1).astype('float32'), axis=1)
     var_scores = np.mean(np.concatenate(all_var_scores, axis=1).astype('float32'), axis=1)
 
-    if verbose: print("ref_scores.shape = " + str(ref_scores.shape))
-    if verbose: print("var_scores.shape = " + str(var_scores.shape))
-    
-    return ref_scores, var_scores
-
-
-#Compute log2 fold-change scores: var_scores vs. ref_scores
-def compute_log2_fold_change_scores(
-        ref_scores, var_scores, 
-        experiment_prefix,
-        center_on_tss=True, re_center=False,
-        verbose=True):
-    
-    tss_str = '_centered_on_tss' if center_on_tss else ''
-    recentered_str = '_recentered' if re_center else ''
+    #Compute log2 fold-change scores: var_scores vs. ref_scores    
 
     scores = np.log2(var_scores / ref_scores)
 
@@ -61,7 +48,8 @@ def compute_log2_fold_change_scores(
 
     #Cache final predicted scores (averaged across ensemble)
 
-    np.save(experiment_prefix + '_final_scores' + tss_str + recentered_str + '.npy', scores)
+    if write_to_file:
+        np.save(experiment_prefix + '_final_scores' + tss_str + recentered_str + '.npy', scores)
 
     return scores
 
