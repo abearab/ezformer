@@ -5,7 +5,7 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - python>=3.9,<=3.12
+  - python==3.11
   - pytorch
   - pytorch-cuda=12.1
   - torchvision
@@ -32,7 +32,7 @@ dependencies:
   - pip
   - pip:
     - enformer-pytorch
-    - tensorflow-gpu
+    - tensorflow-gpu==2.18
     - tensorflow-hub
     - numba
     - pytdc
