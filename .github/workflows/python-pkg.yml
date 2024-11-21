@@ -1,4 +1,4 @@
-name: Python package
+name: python-pkg
 
 on:
   push:
@@ -9,8 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ${{ matrix.os-version }}
-    name: ${{ matrix.os-version }} (${{ matrix.python-version }})
+    runs-on: [self-hosted, linux, x64, gpu]
 
     strategy:
       fail-fast: false
@@ -20,7 +19,13 @@ jobs:
         python-version: ["3.11"]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '14'
+    - run: npm install -g bats
+    - run: bats -v
+
     - name: "Set up Python ${{ matrix.python-version }}"
       uses: actions/setup-python@v3
       with:
