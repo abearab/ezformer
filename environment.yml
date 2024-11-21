@@ -13,8 +13,6 @@ dependencies:
   - lightning
   - cuda-toolkit
   - torchmetrics
-  - tensorflow-gpu
-  - tensorflow-hub
   - numpy
   - pandas
   - python-igraph
@@ -34,6 +32,8 @@ dependencies:
   - pip
   - pip:
     - enformer-pytorch
+    - tensorflow-gpu
+    - tensorflow-hub
     - numba
     - pytdc
     - adpbulk
