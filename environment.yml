@@ -30,9 +30,9 @@ dependencies:
   - mscorefonts
   - pip
   - pip:
-    # - enformer-pytorch
-    - tensorflow-gpu
-    - tensorflow-hub
+    # # - enformer-pytorch
+    # - tensorflow-gpu
+    # - tensorflow-hub
     - numba
     # - pytdc
     - adpbulk
