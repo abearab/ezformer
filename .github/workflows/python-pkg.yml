@@ -14,6 +14,7 @@ jobs:
 
     strategy:
       fail-fast: false
+      max-parallel: 5
       matrix:
         os-version: ["ubuntu-latest"]
         python-version: ["3.11"]
@@ -24,10 +25,9 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'pip'
     - name: "Install flake8"
       run: |
-        pip install flake8
+        pip install flake8 tomli
     - name: "Lint with flake8"
       run: |
         # stop the build if there are Python syntax errors or undefined names
@@ -37,17 +37,17 @@ jobs:
     - name: "Install miniconda"
       uses: conda-incubator/setup-miniconda@v2
       with:
-        miniconda-version: "latest"
-        auto-update-conda: true
-        mamba-version: "*"
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge,bioconda,pytorch,nvidia
-        environment-file: environment.yml
+          miniconda-version: "latest"
+          auto-update-conda: true
+          mamba-version: "*"
+          python-version: ${{ matrix.python-version }}
+          channels: conda-forge,bioconda,pytorch,nvidia
+          environment-file: environment.yml
     - name: "Install pytest"
       shell: bash -l {0}
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel build pytest
+        pip install setuptools wheel build pytest tomli
     - name: "Test with pytest"
       shell: bash -l {0}
       run: |
