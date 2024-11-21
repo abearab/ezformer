@@ -39,6 +39,9 @@ def process_enformer_results(
     ref_scores = np.mean(np.concatenate(all_ref_scores, axis=1).astype('float32'), axis=1)
     var_scores = np.mean(np.concatenate(all_var_scores, axis=1).astype('float32'), axis=1)
 
+    if verbose: print("ref_scores.shape = " + str(ref_scores.shape))
+    if verbose: print("var_scores.shape = " + str(var_scores.shape))
+    
     return ref_scores, var_scores
 
 
