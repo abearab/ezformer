@@ -6,17 +6,22 @@ channels:
   - conda-forge
 dependencies:
   - python==3.11
-  - pytorch
-  - pytorch-cuda==12.1
-  - torchvision
-  - torchaudio
+  # - pytorch
+  # - pytorch-cuda==12.1
+  # - torchvision
+  # - torchaudio
+  # - torchmetrics
   - cuda-toolkit
-  - torchmetrics
   - numpy
   - pandas
   - python-igraph
+  - leidenalg
+  - scikit-learn
   - bioconda::basenji
+  - scanpy
+  - anndata
   - matplotlib
+  - seaborn
   - dill
   - pynvml
   - ipython
@@ -25,11 +30,13 @@ dependencies:
   - mscorefonts
   - pip
   - pip:
-    - enformer-pytorch
+    # - enformer-pytorch
     - tensorflow-gpu==2.18
     - tensorflow-hub
     - numba
-    - pytdc
+    # - pytdc
+    - adpbulk
+    - pydeseq2
     - adjustText
     - watermark
     - pysam
