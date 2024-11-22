@@ -35,7 +35,7 @@ jobs:
           miniconda-version: "latest"
           auto-update-conda: true
           mamba-version: "*"
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
           channels: conda-forge,bioconda,pytorch,nvidia
           environment-file: environment.yml
     - name: "Install pytest"
