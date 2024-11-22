@@ -20,7 +20,12 @@ Source = "https://github.com/abearab/ezformer"
 
 [tool.poetry.dependencies]
 python = "^3.9 <4.0"
-
+numpy = "*"
+pandas = "*"
+tensorflow = "*"
+tensorflow_hub = "*"
+basenji = "*"
+anndata = "*"
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"
