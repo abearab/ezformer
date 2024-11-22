@@ -1,3 +1,4 @@
 *.empty
 **__pycache__/
+**.ipynb_checkpoints
 **actions-runner/
