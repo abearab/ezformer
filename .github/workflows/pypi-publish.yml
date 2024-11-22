@@ -18,7 +18,7 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.9'
-        cache: 'pip'
+
     - name: "Install flake8"
       run: |
         pip install flake8
@@ -28,25 +28,18 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    # - name: "Install miniconda"
-    #   uses: conda-incubator/setup-miniconda@v2
-    #   with:
-    #     miniconda-version: "latest"
-    #     auto-update-conda: true
-    #     mamba-version: "*"
-    #     python-version: ${{ matrix.python-version }}
-    #     channels: conda-forge,bioconda
-    #     environment-file: environment.yml
-    - name: "Install pytest"
-      shell: bash -l {0}
+
+    - name: "Install dependencies"
       run: |
         python -m pip install --upgrade pip
-        pip install setuptools wheel build pytest
-        pip install twine
+        pip install poetry
+        poetry install
+
     - name: "Test with pytest"
       shell: bash -l {0}
       run: |
-        pytest -s
+        poetry run pytest -s
+        
     - name: Build package
       shell: bash -l {0}
       run: |
