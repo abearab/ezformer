@@ -6,18 +6,19 @@ channels:
   - conda-forge
 dependencies:
   - python==3.11
-  - pytorch
-  - pytorch-cuda==12.1
-  - torchvision
-  - torchaudio
-  - torchmetrics
-  - cuda-toolkit
+  - pytorch::pytorch
+  - pytorch::pytorch-cuda==12.1
+  - pytorch::torchvision
+  - pytorch::torchaudio
+  - conda-forge::torchmetrics
+  - conda-forge::cuda-toolkit
+  - bioconda::basenji
+  - conda-forge::anndata
   - numpy
   - pandas
   - python-igraph
   - leidenalg
   - scikit-learn
-  - bioconda::basenji
   - matplotlib
   - dill
   - pynvml
