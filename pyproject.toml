@@ -24,7 +24,7 @@ numpy = "*"
 pandas = "*"
 tensorflow = "*"
 tensorflow_hub = "*"
-basenji = "*"
+tangermeme = "*"
 anndata = "*"
 
 [tool.poetry.group.test.dependencies]
