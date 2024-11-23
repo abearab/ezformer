@@ -1,6 +1,7 @@
 import gc
 import numpy as np
 import torch
+import enformer_pytorch
 from time import time
 from tangermeme.utils import one_hot_encode
 
@@ -15,19 +16,31 @@ track_transforms = 1.
 
 
 #Predict tracks
-def predict_tracks(models, sequence_one_hot, n_folds):
+def predict_tracks(models, sequence_one_hot, n_folds=1, engine='tf'):
     """
+
     models: a list models probably for different folds for cross-validation
-    n_folds: the number of folds
+    sequence_one_hot: the one-hot-encoded sequence
+    n_folds: the number of folds. Default is 1
+    engine: the engine to use for prediction. Default is 'tf'
     """
 
-    
     predicted_tracks = []
-    for fold_ix in range(n_folds) :
-        yh = models[fold_ix].predict_on_batch(sequence_one_hot[None, ...])['human'][:, None, ...].astype('float16')
-        predicted_tracks.append(yh)
 
-    predicted_tracks = np.concatenate(predicted_tracks, axis=1)
+    if engine == 'torch' or engine == 'pytorch':
+        #TODO: Implement PyTorch support
+        raise NotImplementedError("PyTorch support is not implemented yet")
+
+    elif engine == 'tf' or engine == 'tensorflow':
+    
+        for fold_ix in range(n_folds) :
+            yh = models[fold_ix].predict_on_batch(sequence_one_hot[None, ...])['human'][:, None, ...].astype('float16')
+            predicted_tracks.append(yh)
+
+        predicted_tracks = np.concatenate(predicted_tracks, axis=1)
+
+    else:
+        raise ValueError("engine should be either 'torch' / 'pytorch' or 'tf' / 'tensorflow'")
 
     return predicted_tracks
 
