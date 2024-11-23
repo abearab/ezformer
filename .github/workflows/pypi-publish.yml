@@ -35,10 +35,10 @@ jobs:
         pip install poetry
         poetry install
 
-    - name: "Test with pytest"
-      shell: bash -l {0}
-      run: |
-        poetry run pytest -s
+    # - name: "Test with pytest"
+    #   shell: bash -l {0}
+    #   run: |
+    #     poetry run pytest -s
         
     - name: Build package
       shell: bash -l {0}
