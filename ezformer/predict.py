@@ -151,8 +151,8 @@ def predict_single_offset_tss(
         seq_mut = (seq_wt_orig[extra_padding+offset+rel_offset:extra_padding+mid_point+insert_offset] + insert_seq + seq_wt_orig[extra_padding+mid_point+insert_offset+delete_3prime:])[:seq_len]
 
         #One-hot-encode
-        sequence_one_hot_wt  = one_hot_encode(seq_wt,  dtype=torch.FloatTensor).permute(1,0)
-        sequence_one_hot_mut = one_hot_encode(seq_mut, dtype=torch.FloatTensor).permute(1,0)
+        sequence_one_hot_wt = np.array(one_hot_encode(seq_wt).permute(1,0).eq(1))
+        sequence_one_hot_mut = np.array(one_hot_encode(seq_mut).permute(1,0).eq(1))
 
         #Make predictions
         y_wt = predict_tracks(
