@@ -22,10 +22,11 @@ Source = "https://github.com/abearab/ezformer"
 python = "^3.9 <4.0"
 numpy = "*"
 pandas = "*"
+anndata = "*"
+gReLU = "*"
 tensorflow = "*"
 tensorflow_hub = "*"
 tangermeme = "*"
-anndata = "*"
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"
