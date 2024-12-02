@@ -28,6 +28,7 @@ dependencies:
   - mscorefonts
   - pip
   - pip:
+    - lightning
     - enformer-pytorch
     - tensorflow[and-cuda]
     - tensorflow-hub
