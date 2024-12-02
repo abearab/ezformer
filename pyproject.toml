@@ -23,10 +23,11 @@ python = "^3.9 <4.0"
 numpy = "*"
 pandas = "*"
 anndata = "*"
-gReLU = "*"
 lightning = "*"
 tensorflow = "*"
 tensorflow_hub = "*"
+gReLU = "*"
+kipoiseq = "*"
 tangermeme = "*"
 
 [tool.poetry.group.test.dependencies]
