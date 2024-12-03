@@ -5,14 +5,16 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - python==3.11
+  - python>=3.11,<4
   - pytorch::pytorch
   - pytorch::pytorch-cuda
   - pytorch::torchvision
   - pytorch::torchaudio
   - conda-forge::torchmetrics
   - conda-forge::cuda-toolkit
+  - conda-forge::wandb
   - bioconda::basenji
+  - bioconda::kipoiseq
   - conda-forge::anndata
   - numpy
   - pandas
@@ -28,18 +30,16 @@ dependencies:
   - mscorefonts
   - pip
   - pip:
+    - einops
+    - transformers
+    - pyyaml
     - tangermeme
     - gReLU
-    - kipoiseq
     - modisco-lite
     - pysam
+    - numba
     - lightning
     - enformer-pytorch
     - tensorflow[and-cuda]
     - tensorflow-hub
-    - numba
     - watermark
-    - einops
-    - transformers
-    - wandb
-    - pyyaml
