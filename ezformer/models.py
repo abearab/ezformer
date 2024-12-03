@@ -17,7 +17,7 @@ class Performer:
 
     def predict_on_batch(self, inputs, single_track=True):
         # Set the model to evaluation mode
-        predictions = self._model(inputs)
+        predictions = self._model(inputs.to('cuda'))
 
         if single_track:
             # return the predictions (a single number probably from 'Whole Blood' / 'CNhs11761' track)

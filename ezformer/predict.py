@@ -201,8 +201,8 @@ def predict_single_offset_tss(
         
         elif model_type == 'performer':
             #One-hot-encode
-            sequence_one_hot_wt = one_hot_encode(seq_wt).permute(1,0).to(torch.float32).cuda()
-            sequence_one_hot_mut = one_hot_encode(seq_mut).permute(1,0).to(torch.float32).cuda()
+            sequence_one_hot_wt = one_hot_encode(seq_wt).permute(1,0).to(torch.float32)
+            sequence_one_hot_mut = one_hot_encode(seq_mut).permute(1,0).to(torch.float32)
 
             y_wt = predict_single_track_scalar(
                 models=models, 
