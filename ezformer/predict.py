@@ -216,8 +216,8 @@ def predict_single_offset_tss(
                 n_folds=n_folds
             ).astype('float32')
             
-            score_ref = y_wt.mean()
-            score_var = y_mut.mean()
+            score_ref = np.array(y_wt.mean()).reshape(1)
+            score_var = np.array(y_mut.mean()).reshape(1)
         
         else:
             raise ValueError(f"model_type {model_type} is not supported")
@@ -261,8 +261,8 @@ def predict_single_offset_tss(
                     n_folds=n_folds
                 ).astype('float32')
 
-                score_ref_rc = y_wt_rc.mean()
-                score_var_rc = y_mut_rc.mean()
+                score_ref_rc = np.array(y_wt_rc.mean()).reshape(1)
+                score_var_rc = np.array(y_mut_rc.mean()).reshape(1)
             
             else :
                 raise ValueError(f"model_type {model_type} is not supported")
