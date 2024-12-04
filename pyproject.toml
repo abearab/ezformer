@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ezformer"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
 	"Abe Arab <abarbiology@gmail.com>"
 ]
@@ -22,10 +22,13 @@ Source = "https://github.com/abearab/ezformer"
 python = "^3.9 <4.0"
 numpy = "*"
 pandas = "*"
+anndata = "*"
+lightning = "*"
 tensorflow = "*"
 tensorflow_hub = "*"
+gReLU = "*"
+kipoiseq = "*"
 tangermeme = "*"
-anndata = "*"
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"

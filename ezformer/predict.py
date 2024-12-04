@@ -1,6 +1,7 @@
 import gc
 import numpy as np
 import torch
+import enformer_pytorch
 from time import time
 from tangermeme.utils import one_hot_encode
 
@@ -15,21 +16,45 @@ track_transforms = 1.
 
 
 #Predict tracks
-def predict_tracks(models, sequence_one_hot, n_folds):
-    """
+def predict_tracks(models, sequence_one_hot, n_folds=1):
+    """Predict with enformer like model and extract the human tracks
+
     models: a list models probably for different folds for cross-validation
-    n_folds: the number of folds
+    sequence_one_hot: the one-hot-encoded sequence
+    n_folds: the number of folds. Default is 1
     """
 
-    
     predicted_tracks = []
+
     for fold_ix in range(n_folds) :
-        yh = models[fold_ix].predict_on_batch(sequence_one_hot[None, ...])['human'][:, None, ...].astype('float16')
+        yh = models[fold_ix].predict(sequence_one_hot[None, ...])['human'][:, None, ...].astype('float16')
         predicted_tracks.append(yh)
 
     predicted_tracks = np.concatenate(predicted_tracks, axis=1)
 
     return predicted_tracks
+
+
+def predict_single_track_scalar(models, sequence_one_hot, n_folds=1):
+    """Predict with enformer like model on a single track (pre-selected in the model)
+
+    models: a list models probably for different folds for cross-validation
+    sequence_one_hot: the one-hot-encoded sequence
+    n_folds: the number of folds. Default is 1
+
+    return: the predicted scalar value
+    """
+
+    predictions = []
+
+    for fold_ix in range(n_folds) :
+        yh = models[fold_ix].predict(sequence_one_hot).astype('float16')
+        yh = yh[:,yh.shape[1]//2,:] #keep value at center of sequence. The sequence axis is removed
+        predictions.append(yh)
+
+    predictions = np.concatenate(predictions, axis=1)
+
+    return predictions
 
 
 #Function to undo transforms
@@ -67,8 +92,9 @@ def predict_single_offset_tss(
         fasta_open,
         edits_df,
         tss_pos,
-        strand_pair_mask, strand_pair_new,
         experiment_prefix,
+        model_type='enformer-tf',
+        strand_pair_mask=None, strand_pair_new=None,
         re_center=False, center_on_tss=True, score_rc=True, 
         seq_len = 393216,
         print_every = 16, collect_every = 32,
@@ -82,9 +108,10 @@ def predict_single_offset_tss(
     fasta_open: the opened fasta file
     edits_df: the dataframe containing the edits
     tss_pos: the TSS position to center on
+    experiment_prefix: the prefix to save the results
+    model_type: the model type. Default is 'enformer-tf'
     strand_pair_mask: the mask for the strand pairs (output of `preprocess_targets_df`)
     strand_pair_new: the new strand pairs (output of `preprocess_targets_df`)
-    experiment_prefix: the prefix to save the results
     re_center: whether to recenter the edits. Default is False
     center_on_tss: whether to center on TSS. Default is True
     score_rc: score reverse complement as another data augmentation. Default is True
@@ -150,27 +177,51 @@ def predict_single_offset_tss(
         seq_wt = seq_wt_orig[extra_padding+offset:][:seq_len]
         seq_mut = (seq_wt_orig[extra_padding+offset+rel_offset:extra_padding+mid_point+insert_offset] + insert_seq + seq_wt_orig[extra_padding+mid_point+insert_offset+delete_3prime:])[:seq_len]
 
-        #One-hot-encode
-        sequence_one_hot_wt = np.array(one_hot_encode(seq_wt).permute(1,0).eq(1))
-        sequence_one_hot_mut = np.array(one_hot_encode(seq_mut).permute(1,0).eq(1))
-
         #Make predictions
-        y_wt = predict_tracks(
-            models=models, 
-            sequence_one_hot=sequence_one_hot_wt,
-            n_folds=n_folds
-        ).astype('float32')[:, :, aggr_start_bin:aggr_end_bin, :][..., strand_pair_mask]
-        y_mut = predict_tracks(
-            models=models, 
-            sequence_one_hot=sequence_one_hot_mut,
-            n_folds=n_folds
-        ).astype('float32')[:, :, aggr_start_bin:aggr_end_bin, :][..., strand_pair_mask]
+        if model_type == 'enformer-tf' :
+            #One-hot-encode
+            sequence_one_hot_wt = np.array(one_hot_encode(seq_wt).permute(1,0).eq(1))
+            sequence_one_hot_mut = np.array(one_hot_encode(seq_mut).permute(1,0).eq(1))
 
-        #Undo transforms
-        y_wt, y_mut = _undo_transforms(y_wt, y_mut, track_scales, clip_soft, track_transforms)
+            y_wt = predict_tracks(
+                models=models, 
+                sequence_one_hot=sequence_one_hot_wt,
+                n_folds=n_folds
+            ).astype('float32')[:, :, aggr_start_bin:aggr_end_bin, :][..., strand_pair_mask]
+            y_mut = predict_tracks(
+                models=models, 
+                sequence_one_hot=sequence_one_hot_mut,
+                n_folds=n_folds
+            ).astype('float32')[:, :, aggr_start_bin:aggr_end_bin, :][..., strand_pair_mask]
         
-        score_ref = np.mean(y_wt, axis=2)
-        score_var = np.mean(y_mut, axis=2)
+            #Undo transforms
+            y_wt, y_mut = _undo_transforms(y_wt, y_mut, track_scales, clip_soft, track_transforms)
+            
+            score_ref = np.mean(y_wt, axis=2)
+            score_var = np.mean(y_mut, axis=2)
+        
+        elif model_type == 'performer':
+            #One-hot-encode
+            sequence_one_hot_wt = one_hot_encode(seq_wt).permute(1,0).to(torch.float32)
+            sequence_one_hot_mut = one_hot_encode(seq_mut).permute(1,0).to(torch.float32)
+
+            y_wt = predict_single_track_scalar(
+                models=models, 
+                sequence_one_hot=sequence_one_hot_wt,
+                n_folds=n_folds
+            ).astype('float32')
+
+            y_mut = predict_single_track_scalar(
+                models=models, 
+                sequence_one_hot=sequence_one_hot_mut,
+                n_folds=n_folds
+            ).astype('float32')
+            
+            score_ref = y_wt
+            score_var = y_mut
+        
+        else:
+            raise ValueError(f"model_type {model_type} is not supported")
         
         ref_scores.append(score_ref)
         var_scores.append(score_var)
@@ -180,22 +231,42 @@ def predict_single_offset_tss(
 
         #Optionally score rc
         if score_rc :
-            y_wt_rc = predict_tracks(
-                models=models, 
-                sequence_one_hot=sequence_one_hot_wt[::-1, ::-1],
-                n_folds=n_folds
-            ).astype('float32')[:, :, ::-1, :][:, :, aggr_start_bin:aggr_end_bin, :][..., strand_pair_new][..., strand_pair_mask]
-            y_mut_rc = predict_tracks(
-                models=models, 
-                sequence_one_hot=sequence_one_hot_mut[::-1, ::-1],
-                n_folds=n_folds
-            ).astype('float32')[:, :, ::-1, :][:, :, aggr_start_bin:aggr_end_bin, :][..., strand_pair_new][..., strand_pair_mask]
+            if model_type == 'enformer-tf' :
+                y_wt_rc = predict_tracks(
+                    models=models, 
+                    sequence_one_hot=sequence_one_hot_wt[::-1, ::-1],
+                    n_folds=n_folds
+                ).astype('float32')[:, :, ::-1, :][:, :, aggr_start_bin:aggr_end_bin, :][..., strand_pair_new][..., strand_pair_mask]
+                y_mut_rc = predict_tracks(
+                    models=models, 
+                    sequence_one_hot=sequence_one_hot_mut[::-1, ::-1],
+                    n_folds=n_folds
+                ).astype('float32')[:, :, ::-1, :][:, :, aggr_start_bin:aggr_end_bin, :][..., strand_pair_new][..., strand_pair_mask]
+            
+                #Undo transforms
+                y_wt_rc, y_mut_rc = _undo_transforms(y_wt_rc, y_mut_rc, track_scales, clip_soft, track_transforms)
+            
+                score_ref_rc = np.mean(y_wt_rc, axis=2)
+                score_var_rc = np.mean(y_mut_rc, axis=2)
+            
+            elif model_type == 'performer':
+                y_wt_rc = predict_single_track_scalar(
+                    models=models, 
+                    sequence_one_hot=sequence_one_hot_wt.flip(0,1),
+                    n_folds=n_folds
+                ).astype('float32')
 
-            #Undo transforms
-            y_wt_rc, y_mut_rc = _undo_transforms(y_wt_rc, y_mut_rc, track_scales, clip_soft, track_transforms)
-        
-            score_ref_rc = np.mean(y_wt_rc, axis=2)
-            score_var_rc = np.mean(y_mut_rc, axis=2)
+                y_mut_rc = predict_single_track_scalar(
+                    models=models, 
+                    sequence_one_hot=sequence_one_hot_mut.flip(0,1),
+                    n_folds=n_folds
+                ).astype('float32')
+
+                score_ref_rc = y_wt_rc
+                score_var_rc = y_mut_rc
+            
+            else :
+                raise ValueError(f"model_type {model_type} is not supported")
 
             ref_scores_rc.append(score_ref_rc)
             var_scores_rc.append(score_var_rc)
