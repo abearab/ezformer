@@ -31,7 +31,7 @@ class Performer:
 
 #Enformer model code
 class Enformer:
-    '''A wrapper class for the Enformer model.
+    '''A wrapper class for the Enformer-tensorflow model.
     '''
 
     def __init__(self, tfhub_url):
