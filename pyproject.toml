@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ezformer"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
 	"Abe Arab <abarbiology@gmail.com>"
 ]
