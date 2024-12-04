@@ -15,7 +15,7 @@ class Performer:
         self._model = LitModelHeadAdapterWrapper.load_from_checkpoint(checkpoint_path)
         self._model.eval()
 
-    def predict_on_batch(self, inputs, single_track=True):
+    def predict(self, inputs, single_track=True):
         # Set the model to evaluation mode
         predictions = self._model(inputs.to('cuda'))
 
@@ -23,6 +23,7 @@ class Performer:
             # return the predictions (a single number probably from 'Whole Blood' / 'CNhs11761' track)
             return predictions.cpu().detach().numpy()
         else:
+            #TODO: Implement multi-track prediction
             raise NotImplementedError("Currently only single_track=True is supported")
 
 
