@@ -27,7 +27,7 @@ def predict_tracks(models, sequence_one_hot, n_folds=1):
     predicted_tracks = []
 
     for fold_ix in range(n_folds) :
-        yh = models[fold_ix].predict_on_batch(sequence_one_hot[None, ...])['human'][:, None, ...].astype('float16')
+        yh = models[fold_ix].predict(sequence_one_hot[None, ...])['human'][:, None, ...].astype('float16')
         predicted_tracks.append(yh)
 
     predicted_tracks = np.concatenate(predicted_tracks, axis=1)
@@ -48,7 +48,7 @@ def predict_single_track_scalar(models, sequence_one_hot, n_folds=1):
     predictions = []
 
     for fold_ix in range(n_folds) :
-        yh = models[fold_ix].predict_on_batch(sequence_one_hot).astype('float16')
+        yh = models[fold_ix].predict(sequence_one_hot).astype('float16')
         yh = yh[:,yh.shape[1]//2,:] #keep value at center of sequence. The sequence axis is removed
         predictions.append(yh)
 
