@@ -67,8 +67,8 @@ def process_predict_results(
         ref_scores = np.mean(np.concatenate(all_ref_scores, axis=1).astype('float32'), axis=1)
         var_scores = np.mean(np.concatenate(all_var_scores, axis=1).astype('float32'), axis=1)
     elif model_type == 'performer':
-        ref_scores = np.mean(all_ref_scores, axis=0).astype('float32')
-        var_scores = np.mean(all_var_scores, axis=0).astype('float32')
+        ref_scores = np.mean(all_ref_scores, axis=0).astype('float32').reshape(-1, 1)
+        var_scores = np.mean(all_var_scores, axis=0).astype('float32').reshape(-1, 1)
 
     #Compute log2 fold-change scores: var_scores vs. ref_scores    
 
