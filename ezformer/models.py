@@ -17,7 +17,7 @@ class Performer:
 
     def predict(self, inputs, single_track=True):
         # Set the model to evaluation mode
-        predictions = self._model(inputs.to('cuda'))
+        predictions = self._model(inputs.to('cuda')).unsqueeze(0)
 
         if single_track:
             # return the predictions (a single number probably from 'Whole Blood' / 'CNhs11761' track)
